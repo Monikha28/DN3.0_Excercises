@@ -1,0 +1,90 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Enable component scanning -->
+    <context:component-scan base-package="com.library" />
+
+    <!-- Constructor injection for BookService -->
+    <bean id="bookService" class="com.library.service.BookService">
+        <constructor-arg ref="bookRepository"/>
+    </bean>
+
+    <!-- BookRepository bean definition -->
+    <bean id="bookRepository" class="com.library.repository.BookRepository" />
+
+</beans>
+
+
+package com.library.service;
+
+import com.library.repository.BookRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class BookService {
+
+    private BookRepository bookRepository;
+
+    // Constructor for constructor injection
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    // Setter method for setter injection (will be configured in the next step)
+    public void setBookRepository(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    // Business methods using bookRepository
+    public void addBook() {
+        // Implementation
+    }
+}
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Enable component scanning -->
+    <context:component-scan base-package="com.library" />
+
+    <!-- Constructor injection for BookService -->
+    <bean id="bookService" class="com.library.service.BookService">
+        <constructor-arg ref="bookRepository"/>
+        <property name="bookRepository" ref="bookRepository" />
+    </bean>
+
+    <!-- BookRepository bean definition -->
+    <bean id="bookRepository" class="com.library.repository.BookRepository" />
+
+</beans>
+
+
+package com.library;
+
+import com.library.service.BookService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class LibraryManagementApplication {
+    public static void main(String[] args) {
+        // Load Spring context
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        // Retrieve the BookService bean
+        BookService bookService = context.getBean(BookService.class);
+
+        // Use the BookService bean
+        bookService.addBook();
+    }
+}
