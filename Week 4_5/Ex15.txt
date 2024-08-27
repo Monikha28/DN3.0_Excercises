@@ -1,0 +1,125 @@
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-ui</artifactId>
+    <version>2.0.2</version>
+</dependency>
+
+
+springdoc.api-docs.enabled=true
+springdoc.swagger-ui.enabled=true
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.dto.BookDTO;
+import com.bookstoreapi.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    @Autowired
+    private BookService bookService;
+
+    @Operation(summary = "Create a new book")
+    @ApiResponse(responseCode = "200", description = "Book created")
+    @PostMapping
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+        BookDTO createdBook = bookService.createBook(bookDTO);
+        return new ResponseEntity<>(createdBook, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get a book by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Book found"),
+        @ApiResponse(responseCode = "404", description = "Book not found")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        BookDTO bookDTO = bookService.getBookById(id);
+        return ResponseEntity.ok(bookDTO);
+    }
+
+    @Operation(summary = "Update a book by ID")
+    @ApiResponse(responseCode = "200", description = "Book updated")
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+        BookDTO updatedBook = bookService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(updatedBook);
+    }
+
+    @Operation(summary = "Delete a book by ID")
+    @ApiResponse(responseCode = "204", description = "Book deleted")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.dto.CustomerDTO;
+import com.bookstoreapi.service.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Operation(summary = "Create a new customer")
+    @ApiResponse(responseCode = "200", description = "Customer created")
+    @PostMapping
+    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customerDTO) {
+        CustomerDTO createdCustomer = customerService.createCustomer(customerDTO);
+        return new ResponseEntity<>(createdCustomer, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get a customer by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Customer found"),
+        @ApiResponse(responseCode = "404", description = "Customer not found")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
+        CustomerDTO customerDTO = customerService.getCustomerById(id);
+        return ResponseEntity.ok(customerDTO);
+    }
+
+    @Operation(summary = "Update a customer by ID")
+    @ApiResponse(responseCode = "200", description = "Customer updated")
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        CustomerDTO updatedCustomer = customerService.updateCustomer(id, customerDTO);
+        return ResponseEntity.ok(updatedCustomer);
+    }
+
+    @Operation(summary = "Delete a customer by ID")
+    @ApiResponse(responseCode = "204", description = "Customer deleted")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
