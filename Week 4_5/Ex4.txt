@@ -1,0 +1,94 @@
+package com.bookstoreapi.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+    private String address;
+}
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.entity.Customer;
+import com.bookstoreapi.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    // Existing methods...
+
+    // POST /customers - Create a new customer with JSON request body
+    @PostMapping
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+        Customer newCustomer = customerRepository.save(customer);
+        return ResponseEntity.ok(newCustomer);
+    }
+}
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.entity.Customer;
+import com.bookstoreapi.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    // Existing methods...
+
+    // POST /customers/register - Register a new customer with form data
+    @PostMapping("/register")
+    public ResponseEntity<Customer> registerCustomer(
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String address) {
+
+        Customer customer = new Customer();
+        customer.setName(name);
+        customer.setEmail(email);
+        customer.setAddress(address);
+
+        Customer newCustomer = customerRepository.save(customer);
+        return ResponseEntity.ok(newCustomer);
+    }
+}
+
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "address": "123 Main St"
+}

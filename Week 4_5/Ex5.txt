@@ -1,0 +1,126 @@
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.entity.Book;
+import com.bookstoreapi.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    // GET /books/{id} - Get a book by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+        return ResponseEntity.ok(book);
+    }
+
+    // POST /books - Create a new book
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED) // 201 Created
+    public Book createBook(@RequestBody Book book) {
+        return bookRepository.save(book);
+    }
+
+    // PUT /books/{id} - Update an existing book
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+
+        book.setTitle(bookDetails.getTitle());
+        book.setAuthor(bookDetails.getAuthor());
+        book.setPrice(bookDetails.getPrice());
+        book.setIsbn(bookDetails.getIsbn());
+
+        Book updatedBook = bookRepository.save(book);
+        return ResponseEntity.ok(updatedBook);
+    }
+
+    // DELETE /books/{id} - Delete a book
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // 204 No Content
+    public void deleteBook(@PathVariable Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+        bookRepository.delete(book);
+    }
+}
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.entity.Book;
+import com.bookstoreapi.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    // GET /books - Get all books with custom header
+    @GetMapping
+    public ResponseEntity<List<Book>> getAllBooks() {
+        List<Book> books = bookRepository.findAll();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Custom-Header", "CustomHeaderValue");
+
+        return new ResponseEntity<>(books, headers, HttpStatus.OK);
+    }
+
+    // POST /books - Create a new book with custom header
+    @PostMapping
+    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+        Book newBook = bookRepository.save(book);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Book-Created", "True");
+
+        return new ResponseEntity<>(newBook, headers, HttpStatus.CREATED);
+    }
+
+    // PUT /books/{id} - Update an existing book
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+
+        book.setTitle(bookDetails.getTitle());
+        book.setAuthor(bookDetails.getAuthor());
+        book.setPrice(bookDetails.getPrice());
+        book.setIsbn(bookDetails.getIsbn());
+
+        Book updatedBook = bookRepository.save(book);
+        return ResponseEntity.ok(updatedBook);
+    }
+
+    // DELETE /books/{id} - Delete a book
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+        bookRepository.delete(book);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Book-Deleted", "True");
+
+        return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+    }
+}
+
+

@@ -1,0 +1,152 @@
+package com.bookstoreapi.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookDTO {
+    private Long id;
+    private String title;
+    private String author;
+    private double price;
+    private String isbn;
+}
+
+
+package com.bookstoreapi.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CustomerDTO {
+    private Long id;
+    private String name;
+    private String email;
+    private String address;
+}
+
+
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.5.3.Final</version>
+</dependency>
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.5.3.Final</version>
+    <scope>provided</scope>
+</dependency>
+
+
+package com.bookstoreapi.mapper;
+
+import com.bookstoreapi.dto.BookDTO;
+import com.bookstoreapi.entity.Book;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper
+public interface BookMapper {
+    BookDTO toDTO(Book book);
+    Book toEntity(BookDTO bookDTO);
+}
+
+
+package com.bookstoreapi.mapper;
+
+import com.bookstoreapi.dto.CustomerDTO;
+import com.bookstoreapi.entity.Customer;
+import org.mapstruct.Mapper;
+
+@Mapper
+public interface CustomerMapper {
+    CustomerDTO toDTO(Customer customer);
+    Customer toEntity(CustomerDTO customerDTO);
+}
+
+
+<dependency>
+    <groupId>org.modelmapper</groupId>
+    <artifactId>modelmapper</artifactId>
+    <version>3.1.0</version>
+</dependency>
+
+
+package com.bookstoreapi.config;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+}
+
+
+package com.bookstoreapi.service;
+
+import com.bookstoreapi.dto.BookDTO;
+import com.bookstoreapi.entity.Book;
+import com.bookstoreapi.repository.BookRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class BookService {
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public BookDTO getBookById(Long id) {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        return modelMapper.map(book, BookDTO.class);
+    }
+
+    public BookDTO createBook(BookDTO bookDTO) {
+        Book book = modelMapper.map(bookDTO, Book.class);
+        Book savedBook = bookRepository.save(book);
+        return modelMapper.map(savedBook, BookDTO.class);
+    }
+}
+
+package com.bookstoreapi.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BookDTO {
+    private Long id;
+
+    @JsonProperty("bookTitle")
+    private String title;
+
+    private String author;
+    private double price;
+
+    @JsonProperty("isbnCode")
+    private String isbn;
+}

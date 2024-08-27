@@ -1,0 +1,208 @@
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.dto.BookDTO;
+import com.bookstoreapi.entity.Book;
+import com.bookstoreapi.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/books")
+@Validated
+public class BookController {
+
+    @Autowired
+    private BookService bookService;
+
+    @PostMapping
+    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDTO) {
+        BookDTO createdBook = bookService.createBook(bookDTO);
+        return ResponseEntity.ok(createdBook);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        BookDTO bookDTO = bookService.getBookById(id);
+        return ResponseEntity.ok(bookDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @Valid @RequestBody BookDTO bookDTO) {
+        BookDTO updatedBook = bookService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(updatedBook);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.dto.CustomerDTO;
+import com.bookstoreapi.entity.Customer;
+import com.bookstoreapi.service.CustomerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/customers")
+@Validated
+public class CustomerController {
+
+    @Autowired
+    private CustomerService customerService;
+
+    @PostMapping
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+        CustomerDTO createdCustomer = customerService.createCustomer(customerDTO);
+        return ResponseEntity.ok(createdCustomer);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
+        CustomerDTO customerDTO = customerService.getCustomerById(id);
+        return ResponseEntity.ok(customerDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
+        CustomerDTO updatedCustomer = customerService.updateCustomer(id, customerDTO);
+        return ResponseEntity.ok(updatedCustomer);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+package com.bookstoreapi.dto;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookDTO {
+    private Long id;
+
+    @NotNull(message = "Title cannot be null")
+    @Size(min = 1, max = 255, message = "Title must be between 1 and 255 characters")
+    private String title;
+
+    @NotNull(message = "Author cannot be null")
+    @Size(min = 1, max = 255, message = "Author must be between 1 and 255 characters")
+    private String author;
+
+    @Min(value = 0, message = "Price must be greater than or equal to 0")
+    private double price;
+
+    private String isbn;
+}
+
+
+package com.bookstoreapi.dto;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CustomerDTO {
+    private Long id;
+
+    @NotNull(message = "Name cannot be null")
+    @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
+    private String name;
+
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
+    private String email;
+
+    @Size(max = 255, message = "Address must be less than 255 characters")
+    private String address;
+}
+
+
+package com.bookstoreapi.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Entity
+@Data
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Size(min = 1, max = 255)
+    private String title;
+
+    @NotNull
+    @Size(min = 1, max = 255)
+    private String author;
+
+    @Min(0)
+    private double price;
+
+    private String isbn;
+
+    @Version
+    private Long version;
+}
+
+package com.bookstoreapi.entity;
+
+import lombok.Data;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Entity
+@Data
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Size(min = 1, max = 255)
+    private String name;
+
+    @NotNull
+    @Email
+    private String email;
+
+    @Size(max = 255)
+    private String address;
+
+    @Version
+    private Long version;
+}
+

@@ -1,0 +1,62 @@
+@GetMapping("/{id}")
+public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+    Book book = bookRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Book not found with id " + id));
+    return ResponseEntity.ok(book);
+}
+
+
+package com.bookstoreapi.controller;
+
+import com.bookstoreapi.entity.Book;
+import com.bookstoreapi.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    // Existing methods ...
+
+    // GET /books - Get all books with optional filtering by title and author
+    @GetMapping
+    public List<Book> getBooksByParams(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String author) {
+        
+        if (title != null && author != null) {
+            return bookRepository.findByTitleAndAuthor(title, author);
+        } else if (title != null) {
+            return bookRepository.findByTitle(title);
+        } else if (author != null) {
+            return bookRepository.findByAuthor(author);
+        } else {
+            return bookRepository.findAll();
+        }
+    }
+}
+
+
+package com.bookstoreapi.repository;
+
+import com.bookstoreapi.entity.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
+    List<Book> findByTitle(String title);
+    List<Book> findByAuthor(String author);
+    List<Book> findByTitleAndAuthor(String title, String author);
+}
+
+
